@@ -193,7 +193,7 @@ set_binary_path <- function(binary_path,
       binary_path <-
         system.file(
           file.path("osx", binary_name),
-          package = "splitr"
+          package = "sbwsplitr"
           )
     }
 
@@ -201,7 +201,7 @@ set_binary_path <- function(binary_path,
       binary_path <-
         system.file(
           file.path("linux-amd64", binary_name),
-          package = "splitr"
+          package = "sbwsplitr"
         )
     }
 
@@ -209,7 +209,7 @@ set_binary_path <- function(binary_path,
       binary_path <-
         system.file(
           file.path("win", paste0(binary_name, ".exe")),
-          package = "splitr"
+          package = "sbwsplitr"
         )
     }
   } else {
@@ -317,40 +317,29 @@ get_daily_filenames <- function(days,
                                 direction,
                                 prefix = NULL,
                                 suffix = NULL) {
-
-  # Determine the minimum month (as a `Date`) for the model run
-  if (direction == "backward") {
-
-    min_day <-
-      (lubridate::as_date(days) - (duration / 24) - lubridate::days(1)) %>%
-      min()
-
-  } else if (direction == "forward") {
-
-    min_day <-
-      (lubridate::as_date(days)) %>%
-      min()
+  
+  lower_days <- lubridate::as_date(days) -
+    (duration/24) -
+    lubridate::days(1)
+  
+  upper_days <- lubridate::as_date(days) +
+    (duration/24) +
+    lubridate::days(1)
+  
+  if (direction == 'backward') {
+    met_days <- union(days, lower_days)
+    
   }
-
-  # Determine the maximum month (as a `Date`) for the model run
-  if (direction == "backward") {
-
-    max_day <-
-      (lubridate::as_date(days)) %>%
-      max()
-
-  } else if (direction == "forward") {
-
-    max_day <-
-      (lubridate::as_date(days) + (duration / 24) + lubridate::days(1)) %>%
-      max()
+  else if (direction == 'forward') {
+    met_days <- union(days, upper_days)
   }
-
-  met_days <-
-    seq(min_day, max_day, by = "1 day") %>%
+  
+  met_days <- met_days %>%
+    as.Date() %>%
+    sort() %>%
     as.character() %>%
     tidy_gsub("-", "")
-
+  
   paste0(prefix, met_days, suffix)
 }
 
@@ -398,11 +387,12 @@ get_traj_output_filename <- function(traj_name,
     ifelse(is.null(traj_name), "", traj_name),
     "-",
     ifelse(direction == "backward", "bwd", "fwd"), "-",
+    site, "-",
     year, "-",
     month, "-",
     day, "-",
     hour, "-",
-    site,
+    #site,
     "lat_", gsub("\\.", "p", as.character(lat)), "_",
     "lon_", gsub("\\.", "p", as.character(lon)), "-",
     "hgt_", height, "-",

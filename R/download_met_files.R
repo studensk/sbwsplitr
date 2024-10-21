@@ -1,86 +1,51 @@
-#' @noRd
-download_met_files <- function(met_type,
-                               days,
+
+## Make sure the "days" variable is in Date format
+#' Download Meteorology Files
+#'
+#' @param days Dates for which to pull meteorology data
+#' @param duration Duration of desired HYSPLIT run; determines how many dates
+#' before/after "days" are pulled
+#' @param direction Direction of desired HYSPLIT run; determines whether to pull
+#' additional days before or after "days"
+#' @param met_dir Path to directory where meteorology files are to be written
+#'
+#' @return Returns names of met files; downloads necessary meteorology files.
+#' @export
+#'
+#' @examples
+download_met_files <- function(days,
                                duration,
                                direction,
-                               met_dir) {
+                               met_dir = paste0(getwd(), '/meteorology')) {
+  options(timeout = 800)
   
-  if (met_type == "gdas1") {
-    
-    met_files <-
-      get_met_gdas1(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
+  if (!dir.exists(met_dir)) {
+    dir.create(met_dir)
   }
   
-  if (met_type == "gdas0.5") {
-    
-    met_files <-
-      get_met_gdas0p5(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
+  metfiles <- paste0(met_dir, '/', list.files(met_dir, pattern = 't00z.namsa'))
+  metfile_sizes <- file.info(metfiles)$size
+  true_sizes <- sort(unique(metfile_sizes), decreasing = TRUE)[1:2]
+  min_size <- min(true_sizes)
+  small_file_inds <- which(metfile_sizes < min_size)
+  #file.remove(metfiles[small_file_inds])
+  if (length(small_file_inds) > 0) {
+    warning(paste0('Meteorology directory contains ',
+                   length(small_file_inds),
+                   ' met files which are smaller than ',
+                   min_size/1000,
+                   'KB. PLEASE check that all met files are complete before proceeding!!'))
   }
   
-  if (met_type == "gfs0.25") {
-    
-    met_files <-
-      get_met_gfs0p25(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
-  }
+  get_daily_filenames(
+    days = days,
+    duration = duration,
+    direction = direction,
+    suffix = "_hysplit.t00z.namsa"
+  ) %>%
+    get_met_files(
+      path_met_files = met_dir,
+      ftp_dir = "ftp://arlftp.arlhq.noaa.gov/archives/nams"
+    )
   
-  if (met_type == "reanalysis") {
-    
-    met_files <-
-      get_met_reanalysis(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
-  }
-  
-  if (met_type == "nam12") {
-    
-    met_files <-
-      get_met_nam12(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
-  }
-  
-  if (met_type == "narr") {
-    
-    met_files <-
-      get_met_narr(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
-  }
-  
-    if (met_type == "era5") {
-    
-    met_files <-
-      get_met_era5(
-        days = days,
-        duration = duration,
-        direction = direction,
-        path_met_files = met_dir
-      )
-  }
-
-  met_files
 }
