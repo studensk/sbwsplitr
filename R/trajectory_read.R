@@ -20,7 +20,8 @@ trajectory_read <- function(output_folder) {
   trajectory_file_list <- 
     list.files(
       path = output_folder,
-      pattern = "^traj-.*"
+      #pattern = "^traj-.*"
+      pattern = "^traj.*"
     )
   
   # Initialize empty tibble with 12 columns
@@ -186,5 +187,12 @@ trajectory_read <- function(output_folder) {
     }
   }
   
-  traj_tbl
+  traj_tbl_final <- traj_tbl %>%
+    dplyr::mutate(
+      date_i = as.Date(traj_dt_i),
+      traj_id_full = paste(receptor, lat_i, lon_i, height_i, 
+                      date_i, hour_i, sep = '_'),
+      traj_id = as.numeric(factor(traj_id_full)))
+  
+  traj_tbl_final
 }

@@ -363,3 +363,13 @@ hysplit_trajectory <- function(run_df = NULL,
   return(ensemble_tbl)
 }
 
+
+## Receptor should be the outpupt of as.list(get_receptor_values)
+## Should be a list containing: receptor, lat, lon, height, date, hour
+
+## Met filenames should be retrieved before function is run
+# met_files <-
+#   get_daily_filenames(
+#     as.Date(date_i), duration, direction, suffix = "_hysplit.t00z.namsa"
+#   )
+

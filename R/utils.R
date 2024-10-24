@@ -383,7 +383,7 @@ get_traj_output_filename <- function(traj_name,
                                      duration) {
 
   paste0(
-    "traj-",
+    #"traj-",
     ifelse(is.null(traj_name), "", traj_name),
     "-",
     ifelse(direction == "backward", "bwd", "fwd"), "-",
@@ -428,9 +428,14 @@ get_disp_output_filename <- function(disp_name,
 }
 
 get_receptor_values <- function(receptors_tbl,
-                                receptor_i) {
+                                receptor_value,
+                                traj_name) {
 
-  receptors_tbl[receptor_i, ] %>% as.list()
+  receptors_tbl %>%
+    subset(receptor == receptor_value &
+              traj.name == traj_name) %>%
+    as.list()
+  # receptors_tbl[receptor_i, ] %>% as.list()
 }
 
 #' Wrapper for `gsub()` where `x` is the first argument
