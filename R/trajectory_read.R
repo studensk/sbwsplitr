@@ -20,7 +20,7 @@ trajectory_read <- function(output_folder) {
   trajectory_file_list <- 
     list.files(
       path = output_folder,
-      pattern = "^traj-.*"
+      pattern = "^traj.*"
     )
   
   # Initialize empty tibble with 12 columns
@@ -55,10 +55,11 @@ trajectory_read <- function(output_folder) {
     )
   
   # Process all trajectory files
-  for (file_i in trajectory_file_list) {
+  for (ind_i in seq(trajectory_file_list)) {
+    file_i <- trajectory_file_list[ind_i]
     
     file_i_path <- file.path(output_folder, file_i)
-
+    
     file_lines <- readLines(file_i_path, encoding = "UTF-8", skipNul = TRUE)
     
     file_one_line <- readr::read_file(file_i_path)
@@ -172,7 +173,18 @@ trajectory_read <- function(output_folder) {
         tidyr::unite(col = date_h_str, date_str, hour, sep = " ", remove = FALSE) %>%
         dplyr::mutate(traj_dt = lubridate::ymd_h(date_h_str)) %>%
         dplyr::select(-c(date_h_str, date_str, year_full)) %>%
-        dplyr::mutate(traj_dt_i = traj_dt[1])
+        dplyr::mutate(year_full = ifelse(year < 50, year + 2000, year + 1900)) %>%
+        tidyr::unite(col = date_str, year_full, month, day, sep = "-", remove = FALSE) %>%
+        tidyr::unite(col = date_h_str, date_str, hour, sep = " ", remove = FALSE) %>%
+        dplyr::mutate(traj_dt = lubridate::ymd_h(date_h_str)) %>%
+        dplyr::select(-c(date_h_str, date_str, year_full)) %>%
+        dplyr::mutate(
+          lat_i = lat[1],
+          lon_i = lon[1],
+          height_i = height[1],
+          hour_i = hour[1],
+          traj_dt_i = traj_dt[1])
+      traj_tbl_i$receptor <- ind_i
       
       traj_tbl <- traj_tbl %>% dplyr::bind_rows(traj_tbl_i)
     }
