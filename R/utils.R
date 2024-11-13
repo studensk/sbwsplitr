@@ -381,6 +381,22 @@ get_met_files <- function(files, path_met_files, ftp_dir) {
   files
 }
 
+met_file_check <- function(met_dir, dates, duration, direction) {
+  all_met_files <- list.files(met_dir, pattern = "_hysplit.t00z.namsa")
+  met_file <- get_daily_filenames(as.Date(dates), duration, direction, 
+                                  suffix = "_hysplit.t00z.namsa")
+  
+  infolder <- met_file %in% all_met_files
+  if (!all(infolder)) {
+    w <- which(!(infolder))
+    stop('Missing the following met files: \n\n',
+         paste(met_file[w], collapse = '\n'),
+         '\n\nUse sbwsplitr::download_met_files()')
+  }
+  return(met_file)
+}
+
+
 get_traj_output_filename <- function(traj_name,
                                      site,
                                      direction,
@@ -513,4 +529,12 @@ check_start_day <- function(start_day) {
     stop("The value provided to `start_day` must be a valid date.",
          call. = FALSE)
   }
+}
+
+make_run_df <- function(lat, lon, height, date, hour) {
+  ll.df <- data.frame(lat, lon)
+  df <- expand.grid(height, hour, date)
+  names(df) <- c('height', 'hour', 'date')
+  mg.df <- merge(df, ll.df)
+  return(mg.df)
 }
