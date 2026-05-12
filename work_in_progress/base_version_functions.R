@@ -1,6 +1,6 @@
-met_file_check <- function(met_dir, dates) {
-  all_met_files <- list.files(met_dir)
-  met_file <- get_daily_filenames(dates, duration, direction, 
+met_file_check <- function(met_dir, dates, duration, direction) {
+  all_met_files <- list.files(met_dir, pattern = "_hysplit.t00z.namsa")
+  met_file <- get_daily_filenames(as.Date(dates), duration, direction, 
                                   suffix = "_hysplit.t00z.namsa")
   
   infolder <- met_file %in% all_met_files
@@ -8,7 +8,7 @@ met_file_check <- function(met_dir, dates) {
     w <- which(!(infolder))
     stop('Missing the following met files: \n\n',
          paste(met_file[w], collapse = '\n'),
-         '\n\nUse download_met_files()')
+         '\n\nUse sbwsplitr::download_met_files()')
   }
   return(met_file)
 }
@@ -28,7 +28,8 @@ hysplit_trajectory <- function(run_vals = NULL,
                                vbug = 2.5,
                                met_dir = file.path(getwd(), 'meteorology'),
                                directory = NULL, 
-                               bin_path = NULL) {
+                               bin_path = NULL, 
+                               return_traj = TRUE) {
   
   if (is.null(met_dir)) {stop('Please specify met_dir')}
   if (is.null(directory)) {stop('Please specify directory for HYSPLIT run')}
@@ -49,6 +50,8 @@ hysplit_trajectory <- function(run_vals = NULL,
     site <- run_vals$site
   }
   
+  if (!dir.exists(directory)) {dir.create(directory)}
+  
   else {
     null.val <- sapply(list(date, hour, lat, lon, height), is.null)
     if (any(null.val)) {
@@ -58,7 +61,7 @@ hysplit_trajectory <- function(run_vals = NULL,
     }
   }
   
-  met_file <- met_file_check(met_dir, date)
+  met_file <- met_file_check(met_dir, date, duration, direction)
   
   system_type <- get_os()
   
@@ -92,7 +95,7 @@ hysplit_trajectory <- function(run_vals = NULL,
   
   output_filename <-
     get_traj_output_filename(
-      traj_name = traj_name,
+      traj_name = NULL,
       site = site,
       direction = direction,
       year = start_year_GMT,
@@ -141,10 +144,29 @@ hysplit_trajectory <- function(run_vals = NULL,
   
   execute_on_system(sys_cmd, system_type = system_type)
   
+  if (return_traj) {
+    traj_tbl <-
+      trajectory_read(output_folder = directory) %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(
+        lat_i = lat_i,
+        lon_i = lon_i,
+        height_i = height_i,
+        date_i = as.Date(traj_dt_i),
+        traj_id_full = paste('traj', date_i, height_i,
+                             hour_i, sep = '_')
+      )
+    unlink(file.path(directory, output_filename), recursive = TRUE)
+    return(traj_tbl)
+  }
 }
 
 plot_start_points <- function(run_df,
                               pt_size = 1.5) {
+  
+  if (all(names(run_df) != 'date')) {
+    run_df$date <- run_df$date_i
+  }
   ll.distinct <- run_df %>%
     dplyr::mutate(date = as.Date(date),
                   year = year(date),
@@ -164,8 +186,7 @@ plot_start_points <- function(run_df,
   return(g)
   
 }
-
-plot_trajectories <- function(run_df,
+plot_trajectories <- function(traj_df,
                               line_transparency = 1,
                               line_width = 1.25, 
                               origin_pt_size = 2,
@@ -173,18 +194,18 @@ plot_trajectories <- function(run_df,
                               title = NULL,
                               facet_dates = FALSE) {
   
-  run_df <- run_df %>%
+  traj_df <- traj_df %>%
     mutate(date_i = as.Date(date_i))
-  start_pts <- subset(run_df, hour_along == 0)
+  start_pts <- subset(traj_df, hour_along == 0)
   g <- plot_start_points(start_pts,
                          pt_size = origin_pt_size)
   
   g.traj <- g + 
-    geom_path(data = run_df, aes(x = lon, y = lat,
-                                 group = traj_id_full, col = factor(height_i)),
+    geom_path(data = traj_df, aes(x = lon, y = lat,
+                                  group = traj_id_full, col = factor(height_i)),
               alpha = line_transparency, linewidth = line_width) +
-    geom_point(data = run_df, aes(x = lon, y = lat,
-                                  col = factor(height_i)), size = traj_pt_size) +
+    geom_point(data = traj_df, aes(x = lon, y = lat,
+                                   col = factor(height_i)), size = traj_pt_size) +
     geom_point(data = start_pts, aes(x = lon, y = lat), size = traj_pt_size) +
     labs(col = 'Starting \nHeight (m)', title = title) +
     theme(legend.title = element_text(hjust = 0.5))
@@ -194,12 +215,18 @@ plot_trajectories <- function(run_df,
   return(g.traj)
 }
 
-multiple_trajectories <- function(run_df,
+multiple_trajectories <- function(run_df = NULL,
+                                  date = NULL,
+                                  hour = NULL,
+                                  lat = NULL,
+                                  lon = NULL,
+                                  height = NULL,
                                   duration = 9,
                                   direction = 'forward',
                                   model_height = 20000,
                                   vert_motion = 0,
-                                  met_dir = file.path(getwd(), 'meteorology'),
+                                  #met_dir = file.path(getwd(), 'meteorology'),
+                                  met_dir = getwd(),
                                   exec_dir = getwd(), 
                                   binary_path = NULL,
                                   csv_folder = 'traj_output',
@@ -208,7 +235,12 @@ multiple_trajectories <- function(run_df,
                                   rdf_write_name = 'run_data', 
                                   traj_write = TRUE,
                                   traj_write_name = 'trajectories_final',
-                                  plot = FALSE) {
+                                  plot = FALSE, 
+                                  vbug = 2.5, ...) {
+  
+  if (is.null(run_df)) {
+    run_df <- make_run_df(lat, lon, height, date, hour)
+  }
   
   
   # If the execution dir isn't specified, use the working directory
@@ -218,13 +250,13 @@ multiple_trajectories <- function(run_df,
   if (!dir.exists(output_path)) {dir.create(output_path)}
   
   # If the meteorology dir isn't specified, use the working directory
-  if (!dir.exists(met_dir)) {dir.create(met_dir)}
+  # if (!dir.exists(met_dir)) {dir.create(met_dir)}
   
   if (!is.null(run_df)) {days <- unique(run_df$date)}
   
   # days <- sort(as.Date(days))
   days <- as.character(sort(days))
-  met_file <- met_file_check(met_dir, days)
+  met_file <- met_file_check(met_dir, days, duration, direction)
   
   if (is.null(binary_path)) {
     binary_path_set <-
@@ -267,7 +299,8 @@ multiple_trajectories <- function(run_df,
                                    vbug = vbug,
                                    met_dir = met_dir,
                                    directory = run_dir, 
-                                   bin_path = binary_path_set)
+                                   bin_path = binary_path_set,
+                                   return_traj = FALSE)
       }
       
       # all.files <- list.files(receptor_dir)
@@ -293,7 +326,7 @@ multiple_trajectories <- function(run_df,
       write.path <- file.path(output_path, write.file)
       
       write.csv(traj_tbl, write.path, row.names = FALSE)
-      unlink(run_dir, recursive = TRUE)
+      unlink(run_dir, recursive = TRUE, force = TRUE)
       
     })
   }
@@ -302,16 +335,29 @@ multiple_trajectories <- function(run_df,
   traj.lst <- lapply(all.traj.files, function(file) {
     read.csv(file.path(output_path, file))
   }) 
-  traj.df <- bind_rows(traj.lst)
+  traj.df <- bind_rows(traj.lst) 
+  run.df.mg <- run_tbl %>%
+    select(traj_id_full, traj_id) %>%
+    merge(traj.df)
   if (traj_write) {
-    write.csv(traj.df, file.path(exec_dir, paste0(traj_write_name, '.csv')), 
+    # write.csv(traj.df, file.path(exec_dir, paste0(traj_write_name, '.csv')), 
+    #           row.names = FALSE)
+    write.csv(run.df.mg, file.path(exec_dir, paste0(traj_write_name, '.csv')), 
               row.names = FALSE)
   }
   
-  if (clean_up) {unlink(output_path, recursive = TRUE)}
+  if (clean_up) {unlink(output_path, recursive = TRUE, force = TRUE)}
   
   if (plot) {
-    print(plot_trajectories(traj.df))
+    print(plot_trajectories(run.df.mg, ...))
   }
-  return(traj.df)
+  return(run.df.mg)
+}
+
+make_run_df <- function(lat, lon, height, date, hour) {
+  ll.df <- data.frame(lat, lon)
+  df <- expand.grid(height, hour, date)
+  names(df) <- c('height', 'hour', 'date')
+  mg.df <- merge(df, ll.df)
+  return(mg.df)
 }
