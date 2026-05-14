@@ -85,8 +85,7 @@ hysplit_config_init <- function(dir) {
     "splitf = 1.0,",
     "tm_pres = 0,",
     "tm_tpot = 0,",
-    "tm_tamb = 1,",
-    "tm_rain = 0,",
+    "tm_tamb = 0,",
     "tm_mixd = 0,",
     "tm_relh = 0,",
     "tm_sphu = 0,",
@@ -418,9 +417,6 @@ get_disp_output_filename <- function(disp_name,
                                      month,
                                      day,
                                      hour,
-                                     lat,
-                                     lon,
-                                     height,
                                      duration) {
 
   paste0(
@@ -432,9 +428,6 @@ get_disp_output_filename <- function(disp_name,
     month, "-",
     day, "-",
     hour, "-",
-    "lat_", gsub("\\.", "p", as.character(lat)), "_",
-    "lon_", gsub("\\.", "p", as.character(lon)), "-",
-    "hgt_", height, "-",
     duration, "h"
   )
 }

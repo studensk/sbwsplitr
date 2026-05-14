@@ -27,9 +27,10 @@
 #' @export
 add_source <- function(model,
                        name = NULL,
-                       lat = NULL,
-                       lon = NULL,
-                       height = NULL,
+                       geo_df = NULL,
+                       # lat = NULL,
+                       # lon = NULL,
+                       # height = NULL,
                        release_start = NULL,
                        release_end = NULL,
                        rate = NULL,
@@ -47,7 +48,8 @@ add_source <- function(model,
                        rad_decay = NULL,
                        resuspension = NULL) {
 
-  if (any(is.null(lat), is.null(lon), is.null(height))) {
+  # if (any(is.null(lat), is.null(lon), is.null(height))) {
+  if (is.null(geo_df)) {
     
     stop("The `lat`, `lon`, and `height` values must be provided.",
          call. = FALSE)
@@ -69,7 +71,9 @@ add_source <- function(model,
     formals(add_source) %>%
     names() %>%
     base::setdiff(
-      c("model", "name", "lat", "lon", "height",
+      c("model", "name", 
+        "geo_df",
+        #"lat", "lon", "height",
         "release_start", "release_end"
       )
     )
@@ -87,20 +91,24 @@ add_source <- function(model,
     dplyr::as_tibble() %>%
     dplyr::mutate(
       name = name,
-      lat = lat,
-      lon = lon,
-      height = height,
+      # lat = lat,
+      # lon = lon,
+      # height = height,
       release_start = release_start,
       release_end = release_end
     ) %>%
     dplyr::select(
-      name, lat, lon, height, dplyr::starts_with("release"), dplyr::everything()
+      name,
+      # lat, lon, height,
+      dplyr::starts_with("release"), dplyr::everything()
     )
   
   if (is.null(model$sources)) {
     model$sources <- dispersion_source_line
+    model$geo_df <- geo_df
   } else {
     model$sources <- dplyr::bind_rows(model$sources, dispersion_source_line)
+    model$geo_df <- dplyr::bind_rows(model$geo_df, geo_df)
   }
   
   model

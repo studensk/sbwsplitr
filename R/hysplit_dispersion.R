@@ -4,6 +4,7 @@
 #' runs using specified meteorological datasets.
 #' 
 #' @inheritParams hysplit_trajectory
+#' @param geo_df A data frame with columns "lat", "lon", and "height" denoting starting points.
 #' @param binary_name An optional file name for the hysplit binary code. Defaults to "hycs_std", but could be "hycm_std", for example.
 #' @param start_day the day that the model will initialize and run. This should
 #'   take the form of a single-length vector for a day (`"YYYY-MM-DD"`).
@@ -17,9 +18,10 @@
 #'   collection.
 #'   
 #' @export
-hysplit_dispersion <- function(lat = 49.263,
-                               lon = -123.250,
-                               height = 50,
+hysplit_dispersion <- function(geo_df,
+                               # lat = 49.263,
+                               # lon = -123.250,
+                               # height = 50,
                                start_day = "2015-07-01",
                                start_hour = 0,
                                duration = 24,
@@ -67,9 +69,9 @@ hysplit_dispersion <- function(lat = 49.263,
   
   # Stop function if there are vectors of different
   # length for `lat` and `lon`
-  if (length(lat) != length(lon)) {
-    stop("The coordinate vectors are not the same length.", call. = FALSE)
-  }
+  # if (length(lat) != length(lon)) {
+  #   stop("The coordinate vectors are not the same length.", call. = FALSE)
+  # }
   
   # Convert `start_day` to a `Date` object
   start_day <- lubridate::as_date(start_day)
@@ -129,9 +131,9 @@ hysplit_dispersion <- function(lat = 49.263,
       month = start_month_GMT,
       day = start_day_GMT,
       hour = start_hour,
-      lat = lat,
-      lon = lon,
-      height = height,
+      # lat = lat,
+      # lon = lon,
+      # height = height,
       duration = duration
     )
   
@@ -141,9 +143,10 @@ hysplit_dispersion <- function(lat = 49.263,
     start_month_GMT = start_month_GMT,
     start_day_GMT = start_day_GMT,
     start_hour = start_hour,
-    lat = lat,
-    lon = lon,
-    height = height,
+    geo_df = geo_df,
+    # lat = lat,
+    # lon = lon,
+    # height = height,
     direction = direction,
     duration = duration,
     vert_motion = vert_motion,
