@@ -61,6 +61,8 @@ run_model <- function(model) {
       #dplyr::select(-c(lat, lon, height)) %>%
       as.list()
     
+    nsources <- nrow(model$geo_df)
+    
     disp_df <- 
       hysplit_dispersion(
         # lat = lat,
@@ -74,8 +76,10 @@ run_model <- function(model) {
         met_type = model$met_type,
         vert_motion = model$vert_motion,
         model_height = model$model_height,
-        particle_num = 10, #2500,
-        particle_max = 100, #10000,
+        # particle_num = 10*nsources, #2500,
+        # particle_max = 100*nsources, #10000,
+        particle_num = -10,
+        particle_max = 10000,
         species = species_list,
         exec_dir = model$exec_dir,
         met_dir = model$met_dir,

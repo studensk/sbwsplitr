@@ -24,7 +24,7 @@ write_disp_control_file <- function(start_day,
     mutate(string = paste0(lat, " ", lon, " ", height, "\n")) |>
     select(string) |>
     unlist() |>
-    paste0()
+    paste0(collapse = '')
 
   start_block <- 
     paste0(
@@ -39,6 +39,7 @@ write_disp_control_file <- function(start_day,
       length(met_files), "\n",
       paste0(met_dir, "/\n", met_files, collapse = "\n"), "\n"
     )
+  #print(start_block)
   
   i <- 1
   

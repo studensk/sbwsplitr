@@ -43,6 +43,7 @@ hysplit_config_init <- function(dir) {
   # Default `SETUP.CFG` configuration file
   cat(
     "&SETUP",
+    "delt = 60,",
     "tratio = 0.75,",
     "initd = 0,",
     "kpuff = 0,",
@@ -55,7 +56,7 @@ hysplit_config_init <- function(dir) {
     "kblt = 2,",
     "conage = 48,",
     #"numpar = 2500,",
-    "numpar = 10,",
+    "numpar = -120,",
     "qcycle = 0.0,",
     "efile = '',",
     "tkerd = 0.18,",
@@ -67,8 +68,8 @@ hysplit_config_init <- function(dir) {
     "poutf = 'PARDUMP',",
     "mgmin = 10,",
     "kmsl = 0,",
-    #"maxpar = 10000,",
-    "maxpar = 100,",
+    "maxpar = 10000,",
+    #"maxpar = 100,",
     "cpack = 1,",
     "cmass = 0,",
     "dxf = 1.0,",
@@ -383,15 +384,11 @@ get_met_files <- function(files, path_met_files, ftp_dir) {
 }
 
 get_traj_output_filename <- function(traj_name,
-                                     site,
                                      direction,
                                      year,
                                      month,
                                      day,
                                      hour,
-                                     lat,
-                                     lon,
-                                     height,
                                      duration) {
 
   paste0(
@@ -403,10 +400,6 @@ get_traj_output_filename <- function(traj_name,
     month, "-",
     day, "-",
     hour, "-",
-    site,
-    "lat_", gsub("\\.", "p", as.character(lat)), "_",
-    "lon_", gsub("\\.", "p", as.character(lon)), "-",
-    "hgt_", height, "-",
     duration, "h"
   )
 }

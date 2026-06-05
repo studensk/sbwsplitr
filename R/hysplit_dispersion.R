@@ -93,17 +93,19 @@ hysplit_dispersion <- function(geo_df,
   # ASCDATA.CFG files in the working directory
   hysplit_config_init(dir = exec_dir)
   
+  #print(c(particle_num, particle_max))
   # Modify numbers of particles in the SETUP.CFG file
   readLines(con = file.path(exec_dir, "SETUP.CFG")) %>%
     tidy_gsub(
-      pattern = " numpar = ([0-9]*),",
-      replacement = paste0(" numpar = ", particle_num, ",")
+      pattern = "numpar = ([0-9]*),",
+      replacement = paste0("numpar = ", particle_num, ",")
     ) %>%
     tidy_gsub(
-      pattern = " maxpar = ([0-9]*),",
-      replacement = paste0(" maxpar = ", particle_max, ",")
+      pattern = "maxpar = ([0-9]*),",
+      replacement = paste0("maxpar = ", particle_max, ",")
     ) %>%
     writeLines(con = file.path(exec_dir, "SETUP.CFG"))
+  #print(readLines(con = file.path(exec_dir, 'SETUP.CFG')))
   
   # Define starting time parameters
   start_year_GMT <- to_short_year(start_day)
