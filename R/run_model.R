@@ -5,7 +5,7 @@
 #' 
 #' @param model A splitr modeling object.
 #' @export
-run_model <- function(model) {
+run_model <- function(model, particle_max = '100000') {
   
   if (inherits(model, "trajectory_model")) {
     
@@ -78,8 +78,9 @@ run_model <- function(model) {
         model_height = model$model_height,
         # particle_num = 10*nsources, #2500,
         # particle_max = 100*nsources, #10000,
-        particle_num = -10,
-        particle_max = 10000,
+        particle_num = ifelse(is.null(model$particle_num), '-10', 
+                              model$particle_num),
+        particle_max = particle_max,
         species = species_list,
         exec_dir = model$exec_dir,
         met_dir = model$met_dir,

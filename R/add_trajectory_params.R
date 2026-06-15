@@ -103,6 +103,8 @@ add_dispersion_params <- function(model,
                                   met_type = NULL,
                                   vert_motion = NULL,
                                   model_height = NULL,
+                                  particle_num = NULL,
+                                  particle_max = NULL,
                                   exec_dir = NULL,
                                   met_dir = NULL,
                                   binary_path = NULL,
@@ -132,6 +134,10 @@ add_dispersion_params <- function(model,
   
   if (!is.null(model_height)) {
     model$model_height <- model_height
+  }
+  
+  if (!is.null(particle_num)) {
+    model$particle_num <- paste0('-', particle_num)
   }
   
   if (!is.null(exec_dir)) {

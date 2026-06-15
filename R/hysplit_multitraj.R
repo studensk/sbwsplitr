@@ -9,6 +9,9 @@ hysplit_multitraj <- function(full_df,
                               met_dir = NULL,
                               exec_dir = NULL,
                               system_type = 'win') {
+  
+  unlink(list.files(file.path(exec_dir), full.names = TRUE))
+  
   disp.dh <- full_df |>
     select(date, hour) |>
     unique()
@@ -24,7 +27,7 @@ hysplit_multitraj <- function(full_df,
       binary_name = "hyts_std"
     )
   
-  for (d in seq(nrow(disp.dh))) {
+  for (d in seq_len(nrow(disp.dh))) {
     
     hr <- disp.dh$hour[d]
     dat <- disp.dh$date[d]
@@ -104,8 +107,7 @@ hysplit_multitraj <- function(full_df,
     ) %>%
     dplyr::bind_rows() %>%
     dplyr::mutate(temperature = temperature - 273.15) %>%
-    merge(disp) %>%
-    dplyr::arrange(hour_along, particle_i)
+    merge(full_df) 
   
   return(traj_tbl)
 }

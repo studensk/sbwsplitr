@@ -97,7 +97,7 @@ hysplit_dispersion <- function(geo_df,
   # Modify numbers of particles in the SETUP.CFG file
   readLines(con = file.path(exec_dir, "SETUP.CFG")) %>%
     tidy_gsub(
-      pattern = "numpar = ([0-9]*),",
+      pattern = "numpar = (-?[0-9]*),",
       replacement = paste0("numpar = ", particle_num, ",")
     ) %>%
     tidy_gsub(
@@ -160,7 +160,6 @@ hysplit_dispersion <- function(geo_df,
     met_dir = met_dir,
     exec_dir = exec_dir
   )
-  
   
   # The CONTROL file is now complete and in the
   # working directory, so, execute the model run
