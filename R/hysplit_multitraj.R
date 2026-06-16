@@ -23,7 +23,7 @@ hysplit_multitraj <- function(full_df,
     select(date, hour) |>
     unique()
   
-  download_met_files('nam12', unique(disp.dh$date), 
+  download_met_files(met_type, unique(disp.dh$date), 
                      duration = 0, 
                      direction = direction, 
                      met_dir = met_dir)
