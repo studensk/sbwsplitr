@@ -80,6 +80,17 @@ download_met_files <- function(met_type,
         direction = direction,
         path_met_files = met_dir
       )
+    }
+  
+  if (met_type == "nams") {
+    
+    met_files <-
+      get_met_nams(
+        days = days,
+        duration = duration,
+        direction = direction,
+        path_met_files = met_dir
+      )
   }
 
   met_files
