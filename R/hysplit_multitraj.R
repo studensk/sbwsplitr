@@ -76,9 +76,9 @@ hysplit_multitraj <- function(full_df,
       "lat", "lon", "height", "temperature"
     )
   
-  traj.files <- list.files('trajectory_test', pattern = '^traj--')
+  traj.files <- list.files(exec_dir, pattern = '^traj--')
   line.lst <- lapply(traj.files, function(file) {
-    file.name <- paste0('trajectory_test/', file)
+    file.name <- paste0(exec_dir, '/', file)
     file_lines <- readLines(file.name, encoding = "UTF-8", skipNul = TRUE)
     file_one_line <- readr::read_file(file.name)
     header_line <-
