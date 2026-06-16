@@ -1,8 +1,16 @@
-#' @noRd
+#' Download required met files
+#'
+#' 
+#' @param met_type Type of met file.
+#' @param days Vector of dates to download.
+#' @param duration Duration of eventual HYSPLIT runs (determines whether extra dates ar necessary)
+#' @param direction Direction of eventual HYSPLIT runs; "forward" or "backward".
+#' @param met_dir Directory into which met files should be downloaded/checked for.
+#' @export
 download_met_files <- function(met_type,
                                days,
-                               duration,
-                               direction,
+                               duration = 0,
+                               direction = 'forward',
                                met_dir) {
   
   if (met_type == "gdas1") {
