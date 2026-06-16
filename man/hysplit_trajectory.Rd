@@ -4,26 +4,30 @@
 \alias{hysplit_trajectory}
 \title{Conduct HYSPLIT trajectory runs}
 \usage{
-hysplit_trajectory(lat = 49.263, lon = -123.25, height = 50,
-  duration = 24, days = NULL, daily_hours = 0,
-  direction = "forward", met_type = "reanalysis", vert_motion = 0,
-  model_height = 20000, extended_met = FALSE, config = NULL,
-  ascdata = NULL, traj_name = NULL, binary_path = NULL,
-  met_dir = NULL, exec_dir = NULL, clean_up = TRUE)
+hysplit_trajectory(
+  geo_df,
+  duration = 0,
+  date = NULL,
+  hour = 0,
+  direction = "forward",
+  met_type = "reanalysis",
+  vert_motion = 0,
+  model_height = 20000,
+  extended_met = FALSE,
+  temp_only = FALSE,
+  config = NULL,
+  ascdata = NULL,
+  traj_name = NULL,
+  binary_path = NULL,
+  met_dir = NULL,
+  exec_dir = NULL,
+  softrun = NULL,
+  clean_up = TRUE
+)
 }
 \arguments{
-\item{lat, lon, height}{The receptor position in terms of latitude and
-longitude (both in decimal degrees), and height in meters above ground
-level.}
-
 \item{duration}{The duration of each model run (whether it is in the forward
 direction or running backwards) in hours.}
-
-\item{days}{A vector of days that the model will run. This is combined with
-the \code{daily_hours} to produce a series of date-times.}
-
-\item{daily_hours}{A vector of daily hours for initiations of runs across the
-given \code{days}. Use values from from \code{0} to \code{23}.}
 
 \item{direction}{An option to select whether to conduct the model in the
 \code{"forward"} (default) or \code{"backward"} directions.}
@@ -70,6 +74,16 @@ input and output files.}
 
 \item{clean_up}{An option to make the \code{exec_dir} directory clean after
 completion of all trajectory runs. By default, this is set to \code{TRUE}.}
+
+\item{lat, lon, height}{The receptor position in terms of latitude and
+longitude (both in decimal degrees), and height in meters above ground
+level.}
+
+\item{days}{A vector of days that the model will run. This is combined with
+the \code{daily_hours} to produce a series of date-times.}
+
+\item{daily_hours}{A vector of daily hours for initiations of runs across the
+given \code{days}. Use values from from \code{0} to \code{23}.}
 }
 \description{
 The function executes single/multiple forward or backward HYSPLIT trajectory

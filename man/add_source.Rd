@@ -4,21 +4,32 @@
 \alias{add_source}
 \title{Add source parameters to a dispersion model}
 \usage{
-add_source(model, name = NULL, lat = NULL, lon = NULL,
-  height = NULL, release_start = NULL, release_end = NULL,
-  rate = NULL, pdiam = NULL, density = NULL, shape_factor = NULL,
-  ddep_vel = NULL, ddep_mw = NULL, ddep_a_ratio = NULL,
-  ddep_d_ratio = NULL, ddep_hl_coeff = NULL, wdep_hl_coeff = NULL,
-  wdep_in_cloud = NULL, wdep_below_cloud = NULL, rad_decay = NULL,
-  resuspension = NULL)
+add_source(
+  model,
+  name = NULL,
+  geo_df = NULL,
+  release_start = NULL,
+  release_end = NULL,
+  rate = NULL,
+  pdiam = NULL,
+  density = NULL,
+  shape_factor = NULL,
+  ddep_vel = NULL,
+  ddep_mw = NULL,
+  ddep_a_ratio = NULL,
+  ddep_d_ratio = NULL,
+  ddep_hl_coeff = NULL,
+  wdep_hl_coeff = NULL,
+  wdep_in_cloud = NULL,
+  wdep_below_cloud = NULL,
+  rad_decay = NULL,
+  resuspension = NULL
+)
 }
 \arguments{
 \item{model}{A dispersion model object.}
 
 \item{name}{An identifier for the source}
-
-\item{lat, lon, height}{The source position in terms of latitude and longitude
-(both in decimal degrees), and height in meters above ground level.}
 
 \item{release_start, release_end}{The beginning and ending times for the
 source emissions.}
@@ -51,6 +62,9 @@ source emissions.}
 \item{rad_decay}{The rate of radioactive decay, in units of days.}
 
 \item{resuspension}{The pollutant resuspension factor in units of 1/m.}
+
+\item{lat, lon, height}{The source position in terms of latitude and longitude
+(both in decimal degrees), and height in meters above ground level.}
 }
 \description{
 Add a set of source parameters to a dispersion model.

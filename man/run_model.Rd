@@ -4,7 +4,7 @@
 \alias{run_model}
 \title{Run the model}
 \usage{
-run_model(model)
+run_model(model, particle_max = "100000")
 }
 \arguments{
 \item{model}{A splitr modeling object.}

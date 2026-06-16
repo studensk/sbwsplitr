@@ -4,25 +4,29 @@
 \alias{hysplit_dispersion}
 \title{Conduct HYSPLIT dispersion runs}
 \usage{
-hysplit_dispersion(lat = 49.263, lon = -123.25, height = 50,
-  start_day = "2015-07-01", start_hour = 0, duration = 24,
-  direction = "forward", met_type = "reanalysis", vert_motion = 0,
-  model_height = 20000, particle_num = 2500, particle_max = 10000,
-  species, disp_name = NULL, binary_path = NULL, exec_dir = NULL,
-  met_dir = NULL, clean_up = TRUE)
+hysplit_dispersion(
+  geo_df,
+  start_day = "2015-07-01",
+  start_hour = 0,
+  duration = 24,
+  direction = "forward",
+  met_type = "reanalysis",
+  vert_motion = 0,
+  model_height = 20000,
+  particle_num = 10,
+  particle_max = 100,
+  species,
+  disp_name = NULL,
+  binary_path = NULL,
+  binary_name = NULL,
+  exec_dir = NULL,
+  met_dir = NULL,
+  softrun = NULL,
+  clean_up = TRUE
+)
 }
 \arguments{
-\item{lat}{The receptor position in terms of latitude and
-longitude (both in decimal degrees), and height in meters above ground
-level.}
-
-\item{lon}{The receptor position in terms of latitude and
-longitude (both in decimal degrees), and height in meters above ground
-level.}
-
-\item{height}{The receptor position in terms of latitude and
-longitude (both in decimal degrees), and height in meters above ground
-level.}
+\item{geo_df}{A data frame with columns "lat", "lon", and "height" denoting starting points.}
 
 \item{start_day}{the day that the model will initialize and run. This should
 take the form of a single-length vector for a day (\code{"YYYY-MM-DD"}).}
@@ -64,6 +68,8 @@ collection.}
 \item{binary_path}{An optional path to a HYSPLIT trajectory model binary.
 When not specified, the model binary will be chosen from several available
 in the package (based on the user's platform).}
+
+\item{binary_name}{An optional file name for the hysplit binary code. Defaults to "hycs_std", but could be "hycm_std", for example.}
 
 \item{exec_dir}{An optional file path for the working directory of the model
 input and output files.}
