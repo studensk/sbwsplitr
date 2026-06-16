@@ -1,3 +1,10 @@
+#' Conduct extract temperature data from multiple starting points in HYSPLIT
+#' 
+#' 
+#' @inheritParams hysplit_trajectory
+#'   
+#' @export
+
 hysplit_multitraj <- function(full_df,
                               direction = "forward",
                               met_type = "nam12",
