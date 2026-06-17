@@ -38,7 +38,8 @@ hysplit_dispersion <- function(geo_df,
                                exec_dir = NULL,
                                met_dir = NULL,
                                softrun = NULL,
-                               clean_up = TRUE) {
+                               clean_up = TRUE,
+                               seed = -1) {
   
   # If the execution dir isn't specified, use the working directory
   if (is.null(exec_dir)) exec_dir <- getwd()
@@ -91,7 +92,7 @@ hysplit_dispersion <- function(geo_df,
   
   # Write default versions of the SETUP.CFG and
   # ASCDATA.CFG files in the working directory
-  hysplit_config_init(dir = exec_dir)
+  hysplit_config_init(dir = exec_dir, random.seed = seed)
   
   #print(c(particle_num, particle_max))
   # Modify numbers of particles in the SETUP.CFG file
