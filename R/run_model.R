@@ -87,7 +87,7 @@ run_model <- function(model, particle_max = '100000') {
         binary_path = model$binary_path,
         binary_name = model$binary_name,
         softrun = model$softrun,
-        clean_up = model$clean_up
+        clean_up = model$clean_up,
         seed = model$seed
       )
     
