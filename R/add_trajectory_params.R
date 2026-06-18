@@ -25,8 +25,7 @@ add_trajectory_params <- function(model,
                                   met_dir = NULL,
                                   exec_dir = NULL,
                                   softrun = FALSE,
-                                  clean_up = TRUE,
-                                  seed = NULL) {
+                                  clean_up = TRUE) {
   
   if (!is.null(lat)) {
     model$lat <- lat
@@ -92,10 +91,6 @@ add_trajectory_params <- function(model,
     model$clean_up <- clean_up
   }
   
-  if (!is.null(seed)) {
-    model$seed <- seed
-  }
-  
   model
 }
 
@@ -115,7 +110,8 @@ add_dispersion_params <- function(model,
                                   binary_path = NULL,
                                   binary_name = NULL,
                                   softrun = FALSE,
-                                  clean_up = TRUE) {
+                                  clean_up = TRUE,
+                                  seed = NULL) {
   
   if (!is.null(start_time)) {
     model$start_time <- start_time
@@ -163,6 +159,10 @@ add_dispersion_params <- function(model,
   
   if (!is.null(clean_up)) {
     model$clean_up <- clean_up
+  }
+  
+  if (!is.null(seed)) {
+    model$seed <- seed
   }
   
   model
