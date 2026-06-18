@@ -39,7 +39,7 @@ hysplit_dispersion <- function(geo_df,
                                met_dir = NULL,
                                softrun = NULL,
                                clean_up = TRUE,
-                               seed = -1) {
+                               seed = 1) {
   
   # If the execution dir isn't specified, use the working directory
   if (is.null(exec_dir)) exec_dir <- getwd()

@@ -88,6 +88,7 @@ run_model <- function(model, particle_max = '100000') {
         binary_name = model$binary_name,
         softrun = model$softrun,
         clean_up = model$clean_up
+        seed = model$seed
       )
     
     model$disp_df <- disp_df
