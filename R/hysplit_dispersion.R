@@ -43,6 +43,9 @@ hysplit_dispersion <- function(geo_df,
   
   # If the execution dir isn't specified, use the working directory
   if (is.null(exec_dir)) exec_dir <- getwd()
+  else {
+    if (!dir.exists(exec_dir)) {dir.create(exec_dir)}
+  }
   
   # If the meteorology dir isn't specified, use the working directory
   if (is.null(met_dir)) met_dir <- getwd()
@@ -56,10 +59,15 @@ hysplit_dispersion <- function(geo_df,
       binary_name = binary_name
     )
   
-  parhplot_binary_path <-
+  # parhplot_binary_path <-
+  #   set_binary_path(
+  #     binary_path = binary_path,
+  #     binary_name = "parhplot"
+  #   )
+  par2asc_binary_path <-
     set_binary_path(
       binary_path = binary_path,
-      binary_name = "parhplot"
+      binary_name = "par2asc"
     )
   
   # Get the system type
@@ -162,81 +170,52 @@ hysplit_dispersion <- function(geo_df,
     exec_dir = exec_dir
   )
   
+  keep <- list('exec_dir' = exec_dir,
+               'hycs_std_binary_path' = hycs_std_binary_path,
+               'system_type' = system_type,
+               'par2asc_binary_path' = par2asc_binary_path,
+               'clean_up' = clean_up)
+  return(keep)
+}
+  
+hysplit_dispersion_execute <- function(disp_setup) {
   # The CONTROL file is now complete and in the
   # working directory, so, execute the model run
-  sys_cmd <- 
-    paste0(
-      "(cd \"",
-      exec_dir,
-      "\" && \"",
-      hycs_std_binary_path,
-      "\" ",
-      to_null_dev(system_type = system_type),
-      ")"
-    )
-  
-  if (isFALSE(softrun)) {
+  output <- with(disp_setup, {
+    sys_cmd <- 
+      paste0(
+        "(cd \"",
+        exec_dir,
+        "\" && \"",
+        hycs_std_binary_path,
+        "\" ",
+        to_null_dev(system_type = system_type),
+        ")"
+      )
+    
     execute_on_system(sys_cmd, system_type = system_type)
-  }
-  
-  # Extract the particle positions at every hour
-  sys_cmd <- 
-    paste0(
-      "(cd \"",
-      exec_dir,
-      "\" && \"",
-      parhplot_binary_path,
-      "\" -iPARDUMP -a1 ",
-      to_null_dev(system_type = system_type),
-      ")"
-    )
-  
-  if (isFALSE(softrun)) {
+    
+    # Extract the particle positions at every hour
+    sys_cmd <- 
+      paste0(
+        "(cd \"",
+        exec_dir,
+        "\" && \"",
+        par2asc_binary_path,
+        "\" -iPARDUMP -opardump_output.txt",
+        to_null_dev(system_type = system_type),
+        ")"
+      )
+    
     execute_on_system(sys_cmd, system_type = system_type)
-  }
-  
-  if (isFALSE(softrun)) {
-  dispersion_file_list <-
-    list.files(
-      path = exec_dir,
-      pattern = "^GIS_part_[0-9][0-9][0-9]_ps.txt",
-      full.names = TRUE
-    )
-  
-  dispersion_tbl <-
-    dplyr::tibble(
-      particle_i = character(0),
-      hour = integer(0),
-      lat = numeric(0),
-      lon = numeric(0),
-      height = numeric(0)
-    )
-  
-  for (file in dispersion_file_list) {
+    dispersion_tbl <- parse_pardump(file.path(exec_dir, 'pardump_output.txt'))
     
-    hour_index <- 
-      file %>%
-      tidy_gsub(".*GIS_part_([0-9][0-9][0-9])_ps.*", "\\1") %>%
-      as.integer()
-    
-    disp_tbl <-
-      readr::read_csv(
-        file,
-        col_names = c("particle_i", "lon", "lat", "height"),
-        col_types = "cddd",
-        comment = "END"
-      ) %>%
-      dplyr::mutate(hour = hour_index) %>%
-      dplyr::select(particle_i, hour, lat, lon, height)
-    
-    dispersion_tbl <-
-      dplyr::bind_rows(dispersion_tbl, disp_tbl)
+    if (clean_up) {
+      unlink(file.path(exec_dir, list.files(path = exec_dir,
+                                            pattern = "^.*$")), force = TRUE)
     }
-  }
-  
-  if (clean_up) {
-    unlink(file.path(exec_dir, list.files(path = exec_dir, pattern = "^.*$")), force = TRUE)
-  }
-  
-  dispersion_tbl
+    
+    dispersion_tbl
+  })
+  return(output)
 }

@@ -15,9 +15,22 @@ hysplit_multitraj <- function(full_df,
                               traj_name = NULL,
                               met_dir = NULL,
                               exec_dir = NULL,
-                              system_type = 'win') {
+                              system_type = 'win', 
+                              clean_up = TRUE) {
   
   unlink(list.files(file.path(exec_dir), full.names = TRUE))
+  
+  full_df$date <- as.character(full_df$date)
+  
+  col.nms <- names(full_df)
+  
+  # if (!('year' %in% col.nms & 'month' %in% col.nms & 'day' %in% col.nms) & 
+  #     'date' %in% col.nms) {
+  #   full_df <- full_df |>
+  #     mutate(year = year(date),
+  #            month = month(date),
+  #            day = day(date))
+  # }
   
   disp.dh <- full_df |>
     select(date, hour) |>
@@ -113,8 +126,18 @@ hysplit_multitraj <- function(full_df,
       }
     ) %>%
     dplyr::bind_rows() %>%
-    dplyr::mutate(temperature = temperature - 273.15) %>%
-    merge(full_df) 
+    dplyr::mutate(temperature = temperature - 273.15,
+                  date = paste0('20', year, '-',
+                                sprintf('%02d', month), '-',
+                                sprintf('%02d', day))) %>%
+    select(-year, -month, -day) %>%
+    dplyr::right_join(full_df, by = c('lat', 'lon', 'height', 'date', 'hour'))
+    
+
+  if (clean_up) {
+    unlink(file.path(exec_dir, list.files(path = exec_dir,
+                                          pattern = "^.*$")), force = TRUE)
+  }
   
   return(traj_tbl)
 }

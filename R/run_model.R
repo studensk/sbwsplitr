@@ -63,7 +63,8 @@ run_model <- function(model, particle_max = '100000') {
     
     nsources <- nrow(model$geo_df)
     
-    disp_df <- 
+    #disp_df <- 
+    disp_lst <- 
       hysplit_dispersion(
         # lat = lat,
         # lon = lon,
@@ -91,7 +92,8 @@ run_model <- function(model, particle_max = '100000') {
         seed = model$seed
       )
     
-    model$disp_df <- disp_df
-    return(model) 
+    #model$disp_df <- disp_df
+    #return(model) 
+    return(disp_lst)
   }
 }

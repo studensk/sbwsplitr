@@ -38,7 +38,7 @@ read_listing_file <- function(file_path) {
 #' @param dir The directory to which the files should be written.
 #'
 #' @noRd
-hysplit_config_init <- function(dir, random.seed = -1) {
+hysplit_config_init <- function(dir, random.seed = 1) {
   
   # Default `SETUP.CFG` configuration file
   cat(
