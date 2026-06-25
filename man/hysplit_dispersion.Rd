@@ -2,7 +2,7 @@
 % Please edit documentation in R/hysplit_dispersion.R
 \name{hysplit_dispersion}
 \alias{hysplit_dispersion}
-\title{Conduct HYSPLIT dispersion runs}
+\title{Prepare HYSPLIT dispersion runs}
 \usage{
 hysplit_dispersion(
   geo_df,
@@ -22,7 +22,8 @@ hysplit_dispersion(
   exec_dir = NULL,
   met_dir = NULL,
   softrun = NULL,
-  clean_up = TRUE
+  clean_up = TRUE,
+  seed = 1
 )
 }
 \arguments{
@@ -81,6 +82,6 @@ data files.}
 completion of all trajectory runs. By default, this is set to \code{TRUE}.}
 }
 \description{
-The function executes single/multiple forward or backward HYSPLIT dispersion
+The function sets up single/multiple forward or backward HYSPLIT dispersion
 runs using specified meteorological datasets.
 }

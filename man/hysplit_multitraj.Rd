@@ -15,7 +15,8 @@ hysplit_multitraj(
   traj_name = NULL,
   met_dir = NULL,
   exec_dir = NULL,
-  system_type = "win"
+  system_type = "win",
+  clean_up = TRUE
 )
 }
 \arguments{
@@ -48,6 +49,9 @@ data files.}
 
 \item{exec_dir}{An optional file path for the working directory of the model
 input and output files.}
+
+\item{clean_up}{An option to make the \code{exec_dir} directory clean after
+completion of all trajectory runs. By default, this is set to \code{TRUE}.}
 }
 \description{
 Conduct extract temperature data from multiple starting points in HYSPLIT
